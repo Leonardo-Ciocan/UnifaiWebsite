@@ -3,15 +3,12 @@ import { extend } from "jquery"
 import { Message } from "../model/Unifai"
 
 export interface MessageComponentProps {
-    message : Message
-    onSelected? : (msg:Message) => void
 }
 
 export interface MessageComponentState {
-    hovering : boolean
 }
 
-export class MessageComponent extends React.Component<MessageComponentProps, MessageComponentState> {
+export class MessageCreator extends React.Component<any, any> {
     constructor(p:any) { super(p); this.state={hovering:false}}
 
     render() {

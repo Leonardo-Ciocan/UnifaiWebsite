@@ -1,6 +1,6 @@
 import {Message} from "./Message"
 import {Service} from "./Service"
-
+import * as Mock from "./Mock"
 export class API {
     static getServices() : Promise<Array<Service>>{
         return new Promise((resolve,reject) => {
@@ -23,11 +23,9 @@ export class API {
 
     static async getThread(id:string) : Promise<Array<Message>> {
         let services = await API.getServices();
+        let messages = await Mock.getMessages(Math.floor(30 * Math.random()));
         return new Promise<Array<Message>>((resolve,reject) => {
-            resolve([
-                new Message(services[0], "Fxirst message goes right here."),
-                new Message(services[1], "Second message goes right here.")
-            ]);
+            resolve(messages);
         }); 
     }
 

@@ -8,7 +8,7 @@ export interface FeedPageProps {
 }
 
 export interface FeedPageState {
-    feed : Array<Message>
+    feed? : Array<Message>
     selectedThread? : string
 }
 
@@ -32,7 +32,7 @@ export class FeedPage extends React.Component<FeedPageProps, FeedPageState> {
         };
         return <div style={rootStyle}>
             <div style={feedListStyle}>
-                {this.state.feed.map( msg => <MessageComponent message={msg}/>)}
+                {this.state.feed.map( msg => <MessageComponent onSelected={this.feedMessageSelected} message={msg}/>)}
             </div>
             <ThreadComponent style={threadStyle} threadID={this.state.selectedThread}/>
         </div>;
@@ -42,5 +42,11 @@ export class FeedPage extends React.Component<FeedPageProps, FeedPageState> {
         API.getFeed().then(
             (feed) => this.setState({feed})
         )
+    }
+
+    feedMessageSelected = (message:Message) => {
+        this.setState({
+            selectedThread:""
+        })
     }
 }
