@@ -1,0 +1,15 @@
+label.pt-label .pt-input, label.pt-label .pt-select {
+    outline: none!important;
+    border-radius: 5px;
+    box-shadow: none;
+    border: 0px solid rgba(0,0,0,0.05);
+    background: rgba(0,0,0,0.03);
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.pt-button:not([class*="pt-intent-"]) {
+    background: white;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}

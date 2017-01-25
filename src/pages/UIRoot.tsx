@@ -4,7 +4,7 @@ import { FeedPage } from "./FeedPage"
 import { ActionsPage } from "./ActionsPage"
 import { AuthPage } from "./AuthPage"
 import { Router, Route, Link, browserHistory } from 'react-router'
-import * as granim from "granim"
+
 
 export interface UIRootProps {
 }

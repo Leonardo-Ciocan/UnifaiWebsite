@@ -1,7 +1,48 @@
 import {Message} from "./Message"
 import {Service} from "./Service"
 import * as Mock from "./Mock"
+
+type AuthToken = string
+type Nope = ""
 export class API {
+    static getCurrentUser() : Promise<AuthToken> {
+        return new Promise((resolve,reject) => {
+            let token = localStorage["user-token"]
+            if(token != undefined) {
+                resolve(token);
+            }
+            else{
+                reject();
+            }
+        });
+    }
+    
+    static login(username:string, password:string) : Promise<AuthToken> {
+        return new Promise((resolve,reject) => {
+            $.post(
+                "http://127.0.0.1:8000/api-token-auth/",
+                 {username, password}
+            )
+            .done(({token}) => {
+                    localStorage["user-token"] = token;
+                    resolve(token);
+            })
+            .fail(() => reject("This username and password do not match"));
+        });
+    }
+
+    static signup(username:string, email:string, password:string) : Promise<{}> {
+        return new Promise((resolve,reject) => {
+            $.post(
+                "http://127.0.0.1:8000/signup/",
+                {
+                    username, password, email
+                },
+                (data) => resolve()
+            )
+        });
+    }
+
     static getServices() : Promise<Array<Service>>{
         return new Promise((resolve,reject) => {
             resolve([
