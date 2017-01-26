@@ -3,13 +3,20 @@ import {Service} from "./Service"
 import * as Mock from "./Mock"
 
 type AuthToken = string
+type Username = string
 type Nope = ""
 export class API {
-    static getCurrentUser() : Promise<AuthToken> {
+    static getCurrentUser() : Promise<Username> {
         return new Promise((resolve,reject) => {
             let token = localStorage["user-token"]
             if(token != undefined) {
-                resolve(token);
+                $.ajax({
+                    url: "http://127.0.0.1:8000/me/",
+                    type: "GET",
+                    dataType: 'json',
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + token),
+                    success: ({username}) => resolve(username)
+                });
             }
             else{
                 reject();

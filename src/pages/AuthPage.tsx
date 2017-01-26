@@ -13,10 +13,12 @@ export interface AuthPageProps {
 export interface AuthPageState {
     loginUsername : string
     loginPassword : string
+    loginDidFail : boolean
 
     signupUsername : string
     signupEmail : string
     signupPassword : string
+    signupDidFail : boolean
 }
 
 export class AuthPage extends React.Component<AuthPageProps, AuthPageState> {
@@ -25,16 +27,14 @@ export class AuthPage extends React.Component<AuthPageProps, AuthPageState> {
         this.state = {
             loginUsername : "",
             loginPassword : "",
+            loginDidFail: false,
             signupUsername : "RonaldMD",
             signupEmail : "ronald@mcd.com",
-            signupPassword : "cake"
+            signupPassword : "cake",
+            signupDidFail: false
         };
     }
 
-    private toaster: Blueprint.Toaster;
-    private refHandlers = {
-        toaster: (ref: Blueprint.Toaster) => this.toaster = ref,
-    };
 
     render() {
         let rootStyle : React.CSSProperties = {
@@ -50,7 +50,6 @@ export class AuthPage extends React.Component<AuthPageProps, AuthPageState> {
         let inputStyle = { marginLeft:"-10px", width:"500px", padding:"10px"};
         let logoStyle = {width:"250px", height:"250px",marginLeft:"100px"};
         return <div style={rootStyle}>
-           <Blueprint.Toaster position={Blueprint.Position.TOP_RIGHT} ref={this.refHandlers.toaster} />
            <div style={innerDivStyle}>
                 <img style={logoStyle} src="img/unifai-logo.png"/>
                 <Blueprint.Tabs >
@@ -59,6 +58,10 @@ export class AuthPage extends React.Component<AuthPageProps, AuthPageState> {
                         <Blueprint.Tab>Signup</Blueprint.Tab>
                     </Blueprint.TabList>
                     <Blueprint.TabPanel>
+                        <div style={{display: this.state.loginDidFail ? "block": "none"}} className="pt-callout pt-intent-danger">
+                            <h5>Cannot login</h5>
+                            The username and apssword don't match
+                        </div>
                         <label className="pt-label">
                             Username
                             <input onChange={this.loginUsernameChanged} className="pt-input" type="text" style={inputStyle}/>
@@ -90,21 +93,30 @@ export class AuthPage extends React.Component<AuthPageProps, AuthPageState> {
     }
 
 
-    componentDidMount() {
-        
+    async componentDidMount() {
+        API.getCurrentUser().then(
+            () => browserHistory.push('/feed')
+        );
     }
 
     signupUsernameChanged = (e:any) => this.setState({signupUsername:e.target.value})
     signupEmailChanged = (e:any) => this.setState({signupUsername:e.target.value})
     signupPasswordChanged = (e:any) => this.setState({signupPassword:e.target.value})
     signupClicked = async () => {
-        this.toaster.show({message:"User sucks", intent: Blueprint.Intent.DANGER});
+        API.signup(this.state.signupUsername, this.state.signupEmail, this.state.loginPassword)
+        .then(
+            (t) => console.log(t)
+        )
+        .catch((reason) => this.setState({loginDidFail:true}))
     }
 
     loginUsernameChanged = (e:any) => this.setState({loginUsername:e.target.value})
     loginPasswordChanged = (e:any) => this.setState({loginPassword:e.target.value})
     loginClicked = async () => {
-        console.log("Singing up");
-        console.log(await API.login(this.state.loginUsername, this.state.loginPassword));
+        API.login(this.state.loginUsername, this.state.loginPassword)
+        .then(
+            (t) => browserHistory.push('/feed')
+        )
+        .catch((reason) => this.setState({loginDidFail:true}))
     }
 }
