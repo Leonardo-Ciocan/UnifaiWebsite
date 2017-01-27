@@ -29,7 +29,8 @@ export class MessageComponent extends React.Component<MessageComponentProps, Mes
             marginBottom:"5px",
             marginLeft:"50px",
             fontWeight:400,
-            fontSize:"11pt"
+            fontSize:"11pt",
+            color: `rgb(${this.props.message.sender.color})`
         };
         let bodyStyle = {
             display:"block",
@@ -54,10 +55,10 @@ export class MessageComponent extends React.Component<MessageComponentProps, Mes
         };
         return <div onClick={this.mouseClick} style={rootStyle} onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseExit}>
             <div>
-                <span style={serviceNameStyle}>{this.props.message.sender.name}</span>
+                <span style={serviceNameStyle}>{this.props.message.sender.name.toUpperCase()}</span>
                 <span style={timestampStyle}>Today at 13:45</span>            
-            </div>
-            <span style={bodyStyle}>{this.props.message.body}</span>
+            </div> 
+            <span style={bodyStyle} dangerouslySetInnerHTML={{__html:this.props.message.content}}></span>
             <img style={iconStyle} src={this.props.message.image}/>
         </div>
     }

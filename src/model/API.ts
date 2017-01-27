@@ -1,3 +1,4 @@
+import { API } from './API';
 import {Message} from "./Message"
 import {Service} from "./Service"
 import * as Mock from "./Mock"
@@ -6,6 +7,35 @@ type AuthToken = string
 type Username = string
 type Nope = ""
 export class API {
+
+    static sendMessage(message:string) : Promise<{}> {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                    url:"http://127.0.0.1:8000/message/",
+                    type: "POST",
+                    dataType: 'json',
+                    data:{content:message},
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: ({username}) => resolve(username),
+                    error: () => reject("")
+                });
+        });
+    }
+
+    static sendMessageToThread(message:string, threadID:string) : Promise<{}> {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                    url:"http://127.0.0.1:8000/message/",
+                    type: "POST",
+                    dataType: 'json',
+                    data:{content:message,thread_id:threadID},
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: ({username}) => resolve(username),
+                    error: () => reject("")
+                });
+        });
+    }
+
     static getCurrentUser() : Promise<Username> {
         return new Promise((resolve,reject) => {
             let token = localStorage["user-token"]
@@ -50,30 +80,54 @@ export class API {
         });
     }
 
-    static getServices() : Promise<Array<Service>>{
+    static services : Service[] = []
+    static getServices() : Promise<Service[]>{
         return new Promise((resolve,reject) => {
-            resolve([
-                new Service("Github","github","0, 96, 165"),
-                new Service("News","news","165, 0, 0")
-            ]);
+            if (API.services.length > 0) resolve(API.services);
+            $.ajax({
+                    url: "http://127.0.0.1:8000/services/all/",
+                    type: "GET",
+                    dataType: 'json',
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: (servicesJson) => {
+                        API.services = servicesJson.map((json:any) => Service.fromJson(json));
+                        resolve(API.services);
+                    },
+                    error: () => reject()
+            });
         });
     }
 
     static async getFeed() : Promise<Array<Message>> {
         let services = await API.getServices();
+
         return new Promise<Array<Message>>((resolve,reject) => {
-            resolve([
-                new Message(services[0], "First message goes right here."),
-                new Message(services[1], "Second message goes right here.")
-            ]);
+            $.ajax({
+                    url: "http://127.0.0.1:8000/feed/",
+                    type: "GET",
+                    dataType: 'json',
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: (feedJson) => {
+                        resolve(feedJson.map((json:any) => Message.fromJson(json)))
+                    },
+                    error: () => reject()
+            });
         }); 
     }
 
-    static async getThread(id:string) : Promise<Array<Message>> {
+    static async getThread(id:string) : Promise<Message[]> {
         let services = await API.getServices();
-        let messages = await Mock.getMessages(Math.floor(30 * Math.random()));
         return new Promise<Array<Message>>((resolve,reject) => {
-            resolve(messages);
+            $.ajax({
+                    url: "http://127.0.0.1:8000/thread/" + id,
+                    type: "GET",
+                    dataType: 'json',
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: (feedJson) => {
+                        resolve(feedJson.map((json:any) => Message.fromJson(json)))
+                    },
+                    error: () => reject()
+            });
         }); 
     }
 

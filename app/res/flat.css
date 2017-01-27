@@ -1,4 +1,4 @@
-label.pt-label .pt-input, label.pt-label .pt-select {
+label.pt-label .pt-input, label.pt-label .pt-select, .pt-input, .pt-input:focus, .pt-input:active {
     outline: none!important;
     border-radius: 5px;
     box-shadow: none;
