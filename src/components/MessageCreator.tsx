@@ -36,6 +36,29 @@ export class MessageCreator extends React.Component<MessageCreatorProps, any> {
     }
 
     keyPress = (e:any) => {
-        if(e.key == "Enter") this.props.shouldSendMessage(e.target.value);
+        if(e.key == "Enter") {
+            let tokens = this.getTokens(e.target.value);
+            if(tokens.length > 0){
+                let first = "<" + tokens[0] + ">";
+                let firstPos = e.target.value.indexOf(first);
+                e.target.setSelectionRange(firstPos, firstPos + first.length);
+            }
+            else {
+                this.props.shouldSendMessage(e.target.value);
+            }
+        }
+    }
+
+    getTokens(str:string) : string[] {
+        var results : string[] = []
+        let tokenRegex = /<([^><]+)>/g;
+        var match = tokenRegex.exec(str)
+        while(match != undefined) {
+            for(var i = 1; i < match.length;i ++) {
+                results.push(match[i]);
+            }
+            match = tokenRegex.exec(str);
+        }
+        return results;
     }
 }

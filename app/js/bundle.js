@@ -21520,6 +21520,7 @@
 	const ThreadComponent_1 = __webpack_require__(187);
 	const MessageCreator_1 = __webpack_require__(328);
 	const core_1 = __webpack_require__(189);
+	const react_router_1 = __webpack_require__(273);
 	class FeedPage extends React.Component {
 	    constructor(props) {
 	        super(props);
@@ -21557,7 +21558,7 @@
 	            React.createElement("button", { className: "pt-button pt-fill pt-minimal " }, "Settings"),
 	            React.createElement("button", { className: "pt-button pt-fill pt-minimal " }, "Logout")));
 	        return React.createElement("div", { style: rootStyle },
-	            React.createElement("nav", { style: { boxShadow: "none" }, className: "pt-navbar pt-fixed-top" },
+	            React.createElement("nav", { style: { boxShadow: "none", borderBottom: "1px solid rgba(0,0,0,0.05)" }, className: "pt-navbar pt-fixed-top" },
 	                React.createElement("div", { className: "pt-navbar-group pt-align-right" },
 	                    React.createElement(core_1.Popover, { content: popoverContent, interactionKind: core_1.PopoverInteractionKind.CLICK, popoverClassName: "pt-popover-content-sizing", position: core_1.Position.BOTTOM_RIGHT, useSmartPositioning: false },
 	                        React.createElement("button", { className: "pt-button pt-minimal pt-icon-user" }, this.state.username))),
@@ -21582,7 +21583,8 @@
 	    }
 	    componentDidMount() {
 	        this.getFeed();
-	        Unifai_1.API.getCurrentUser().then((username) => this.setState({ username: username }));
+	        Unifai_1.API.getCurrentUser().then((username) => this.setState({ username: username }))
+	            .catch(() => react_router_1.browserHistory.push("/"));
 	    }
 	}
 	exports.FeedPage = FeedPage;
@@ -48976,8 +48978,17 @@
 	    constructor(p) {
 	        super(p);
 	        this.keyPress = (e) => {
-	            if (e.key == "Enter")
-	                this.props.shouldSendMessage(e.target.value);
+	            if (e.key == "Enter") {
+	                let tokens = this.getTokens(e.target.value);
+	                if (tokens.length > 0) {
+	                    let first = "<" + tokens[0] + ">";
+	                    let firstPos = e.target.value.indexOf(first);
+	                    e.target.setSelectionRange(firstPos, firstPos + first.length);
+	                }
+	                else {
+	                    this.props.shouldSendMessage(e.target.value);
+	                }
+	            }
 	        };
 	        this.state = { hovering: false };
 	    }
@@ -48996,6 +49007,18 @@
 	            React.createElement("input", { onKeyPress: this.keyPress, style: textBoxStyle, className: "pt-input pt-fill", placeholder: "Ask us anything" }),
 	            React.createElement(core_1.Popover, { content: popoverContent, interactionKind: core_1.PopoverInteractionKind.CLICK, popoverClassName: "pt-popover-content-sizing", position: core_1.Position.RIGHT_TOP, useSmartPositioning: false },
 	                React.createElement("button", { type: "button", className: "pt-button pt-minimal pt-icon-refresh pt-icon-book" })));
+	    }
+	    getTokens(str) {
+	        var results = [];
+	        let tokenRegex = /<([^><]+)>/g;
+	        var match = tokenRegex.exec(str);
+	        while (match != undefined) {
+	            for (var i = 1; i < match.length; i++) {
+	                results.push(match[i]);
+	            }
+	            match = tokenRegex.exec(str);
+	        }
+	        return results;
 	    }
 	}
 	exports.MessageCreator = MessageCreator;

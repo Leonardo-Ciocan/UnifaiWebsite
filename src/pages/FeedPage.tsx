@@ -4,6 +4,8 @@ import {Message, Service, API} from "../model/Unifai"
 import {ThreadComponent} from "../components/ThreadComponent"
 import {MessageCreator} from "../components/MessageCreator"
 import {Popover, PopoverInteractionKind, Position, Menu, MenuItem} from "@blueprintjs/core"
+import {browserHistory} from "react-router"
+
 export interface FeedPageProps {
 
 }
@@ -43,7 +45,7 @@ export class FeedPage extends React.Component<FeedPageProps, FeedPageState> {
             </div>
         );
         return <div style={rootStyle}>
-            <nav style={{boxShadow:"none"}} className="pt-navbar pt-fixed-top">
+            <nav style={{boxShadow:"none", borderBottom:"1px solid rgba(0,0,0,0.05)"}} className="pt-navbar pt-fixed-top">
                 <div className="pt-navbar-group pt-align-right">
                      <Popover content={popoverContent}
                      interactionKind={PopoverInteractionKind.CLICK}
@@ -95,7 +97,8 @@ export class FeedPage extends React.Component<FeedPageProps, FeedPageState> {
         this.getFeed();
         API.getCurrentUser().then(
             (username) => this.setState({username:username})
-        );
+        )
+        .catch(()=> browserHistory.push("/"));
     }
 
     feedMessageSelected = (message:Message) => {
