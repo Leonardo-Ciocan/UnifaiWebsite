@@ -5,6 +5,7 @@ import {ThreadComponent} from "../components/ThreadComponent"
 import {MessageCreator} from "../components/MessageCreator"
 import {Popover, PopoverInteractionKind, Position, Menu, MenuItem} from "@blueprintjs/core"
 import {browserHistory} from "react-router"
+import { NavigationBar } from '../components/NavigationBar';
 
 export interface FeedPageProps {
 
@@ -38,32 +39,9 @@ export class FeedPage extends React.Component<FeedPageProps, FeedPageState> {
             overflowY:"scroll",
             overflowX:"hidden"
         };
-        let popoverContent = (
-            <div>
-                <button className="pt-button pt-fill pt-minimal ">Settings</button>
-                <button className="pt-button pt-fill pt-minimal ">Logout</button>
-            </div>
-        );
+        
         return <div style={rootStyle}>
-            <nav style={{boxShadow:"none", borderBottom:"1px solid rgba(0,0,0,0.05)"}} className="pt-navbar pt-fixed-top">
-                <div className="pt-navbar-group pt-align-right">
-                     <Popover content={popoverContent}
-                     interactionKind={PopoverInteractionKind.CLICK}
-                     popoverClassName="pt-popover-content-sizing"
-                     position={Position.BOTTOM_RIGHT}
-                     useSmartPositioning={false}>
-                    <button className="pt-button pt-minimal pt-icon-user">{this.state.username}</button>
-                     </Popover>
-                </div>
-                <div className="pt-navbar-group pt-align-left">
-                    <div className="pt-navbar-heading">Unifai</div>
-                    <span className="pt-navbar-divider"></span>
-                    <button className="pt-button pt-minimal pt-icon-home">Home</button>
-                    <button className="pt-button pt-minimal pt-icon-dashboard">Dashboard</button>
-                    <button className="pt-button pt-minimal pt-icon-play">Actions</button>
-                    <button className="pt-button pt-minimal pt-icon-book">Catalog</button>
-                </div>
-                </nav>
+            <NavigationBar/>
             <div style={feedListStyle}>
                 <MessageCreator shouldSendMessage={this.shouldSendMessage}/>
                 {this.state.feed.map( msg => <MessageComponent key={msg.id} onSelected={this.feedMessageSelected} message={msg}/>)}
@@ -93,12 +71,9 @@ export class FeedPage extends React.Component<FeedPageProps, FeedPageState> {
             }
         );
     }
+
     componentDidMount() {
         this.getFeed();
-        API.getCurrentUser().then(
-            (username) => this.setState({username:username})
-        )
-        .catch(()=> browserHistory.push("/"));
     }
 
     feedMessageSelected = (message:Message) => {

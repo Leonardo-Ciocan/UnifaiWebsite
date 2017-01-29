@@ -1,12 +1,30 @@
-import { API } from './API';
 import {Message} from "./Message"
 import {Service} from "./Service"
+import {Action} from "./Action"
 import * as Mock from "./Mock"
+import { CatalogEntry } from './CatalogEntry';
 
 type AuthToken = string
 type Username = string
-type Nope = ""
+
+export var services : Service[] = []
+
 export class API {
+
+    
+    static createAction(name:string, message:string) : Promise<{}> {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                    url:"http://127.0.0.1:8000/action/",
+                    type: "POST",
+                    dataType: 'json',
+                    data:{name, message},
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: () => resolve(),
+                    error: () => reject("")
+            }); 
+        });
+    }
 
     static sendMessage(message:string) : Promise<{}> {
         return new Promise((resolve,reject) => {
@@ -80,18 +98,17 @@ export class API {
         });
     }
 
-    static services : Service[] = []
     static getServices() : Promise<Service[]>{
         return new Promise((resolve,reject) => {
-            if (API.services.length > 0) resolve(API.services);
+            if (services.length > 0) resolve(services);
             $.ajax({
                     url: "http://127.0.0.1:8000/services/all/",
                     type: "GET",
                     dataType: 'json',
                     beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
                     success: (servicesJson) => {
-                        API.services = servicesJson.map((json:any) => Service.fromJson(json));
-                        resolve(API.services);
+                        services = servicesJson.map((json:any) => Service.fromJson(json));
+                        resolve(services);
                     },
                     error: () => reject()
             });
@@ -131,8 +148,40 @@ export class API {
         }); 
     }
 
-    static getUser() {}
-    static getActions() {}
-    static getDashboard() {}
-    static getCatalog() {}
+    static async getActions() : Promise<Action[]> {
+        let services = await API.getServices();
+        return new Promise<Array<Action>>((resolve,reject) => {
+            $.ajax({
+                    url: "http://127.0.0.1:8000/action/",
+                    type: "GET",
+                    dataType: 'json',
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: (jsonArray) => {
+                        resolve(jsonArray.map((json:any) => Action.fromJson(json)))
+                    },
+                    error: () => reject()
+            });
+        }); 
+    }
+
+    static async getCatalog() : Promise<{ [key:string]:CatalogEntry[]; }> {
+        let services = await API.getServices();
+        return new Promise<{ [key:string]:CatalogEntry[]; }>((resolve,reject) => {
+            $.ajax({
+                    url: "http://127.0.0.1:8000/catalog/",
+                    type: "GET",
+                    dataType: 'json',
+                    beforeSend: (xhr) => xhr.setRequestHeader('Authorization', "Token " + localStorage["user-token"]),
+                    success: (rawCatalog) => {
+                        let services = Object.keys(rawCatalog)
+                        var catalog : { [key:string]:CatalogEntry[]; }  = {}
+                        services.forEach(
+                            service => catalog[service] = rawCatalog[service].map((json:any) => CatalogEntry.fromJson(json))
+                        );
+                        resolve(catalog);
+                    },
+                    error: () => reject()
+            });
+        }); 
+    }
 }

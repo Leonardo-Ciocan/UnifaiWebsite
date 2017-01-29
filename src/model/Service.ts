@@ -1,4 +1,4 @@
-import { API } from './API';
+import { API, services } from './API';
 export class Service {
     constructor(public id : string,
                 public name:String,
@@ -11,9 +11,9 @@ export class Service {
     }
 
     static getWithName(name:string) : Service {
-        let services = API.services.filter((s) => s.name == name)
-        if(services.length > 0) {
-            return services[0]
+        let fservices = services.filter((s) => s.name == name)
+        if(fservices.length > 0) {
+            return fservices[0]
         }
         else {
             return new this("-1", "You", "0,0,0")

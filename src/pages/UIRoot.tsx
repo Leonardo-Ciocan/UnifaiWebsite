@@ -4,6 +4,7 @@ import { FeedPage } from "./FeedPage"
 import { ActionsPage } from "./ActionsPage"
 import { AuthPage } from "./AuthPage"
 import { Router, Route, Link, browserHistory } from 'react-router'
+import { CatalogPage } from './CatalogPage';
 
 
 export interface UIRootProps {
@@ -26,6 +27,7 @@ export class UIRoot extends React.Component<UIRootProps, undefined> {
                     <Route path="/" component={AuthPage}/>
                     <Route path="feed" component={FeedPage}/>
                     <Route path="actions" component={ActionsPage}/>
+                    <Route path="catalog" component={CatalogPage}/>
                 </Router>
         </div>;
     }
